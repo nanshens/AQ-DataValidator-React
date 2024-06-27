@@ -6,7 +6,7 @@ export default defineConfig({
     { path: "/config/:id", component: "config" },
     { path: "/execute", component: "execute" },
     { path: "/result", component: "result" },
-    { path: "/test", component: "test2" },
+    { path: "/test", component: "test3" },
   ],
   npmClient: 'pnpm',
   proxy: {
