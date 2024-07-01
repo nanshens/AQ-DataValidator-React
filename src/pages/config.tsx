@@ -2,84 +2,58 @@ import {Button, Col, Layout, message, Row} from "antd";
 const { Header, Footer, Sider, Content } = Layout;
 import styles from './config.less';
 import {useParams} from "react-router";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {getAllValidator, getValidatorInfo} from "@/services/api";
-import {DragSortTable, ProColumns} from "@ant-design/pro-components";
-
-const columns: ProColumns[] = [
-    {
-        dataIndex: 'sort',
-        width: 60,
-        className: 'drag-visible',
-    },
-    {
-        dataIndex: 'code',
-        className: 'drag-visible',
-    },
-    {
-        dataIndex: 'name',
-        className: 'drag-visible',
-    },
-    {
-        title: '操作',
-        valueType: 'option',
-        render: (text, record, _, action) => [
-            <a key="editable" onClick={() => {action?.startEditable?.(record.id);}}>
-                编辑
-            </a>,
-            <a key="delete" onClick={() => {action?.startEditable?.(record.id);}}>
-                删除
-            </a>,
-        ],
-    }
-];
-
-const data = [
-    {
-        key: '1',
-        name: 'John Brown',
-        code: 32,
-        address: 'New York No. 1 Lake Park',
-    },
-    {
-        key: '2',
-        name: 'Jim Green',
-        code: 42,
-        address: 'London No. 1 Lake Park',
-    },
-    {
-        key: '3',
-        name: 'Joe Black',
-        code: 32,
-        address: 'Sidney No. 1 Lake Park',
-    },
-];
+import CustomTable from "@/components/CustomTable";
+import {AttributeProps, EntityProps, ValidatorProps} from "@/types/validator";
 
 export default function ConfigPage() {
     const urlParams  = useParams();
-    const [validator, setValidator] = useState({
-        id: "",code: "",name: "",config: []
+    const [validator, setValidator] = useState<ValidatorProps>({
+        id: "", code: "", name: "", active: true, config: []
     });
-    const [dataSource, setDataSource] = useState(data);
+    const [selectedEntityId, setSelectedEntityId] = useState<string>('');
+    const [editableEntityId, setEditableEntityId] = useState<string>('');
+    const [selectedAttrId, setSelectedAttrId] = useState<string>('');
+    const [editableAttrId, setEditableAttrId] = useState<string>('');
 
-    const handleDragSortEnd = (
-        beforeIndex: number,
-        afterIndex: number,
-        newDataSource: any,
-    ) => {
-        console.log('排序后的数据', newDataSource);
-        setDataSource(newDataSource);
-        message.success('修改列表排序成功');
-    };
+    const setEntity = (entity: EntityProps[]) => {
+        setValidator({...validator, config: entity})
+    }
+
+    const filterAttr = ():AttributeProps[] => {
+        const entities: any[] = validator.config.filter((i:any) => i.id === selectedEntityId);
+        if (entities.length > 0) {
+            return entities[0].attributes;
+        }
+        return []
+    }
+
+    const setAttr = (attrs: AttributeProps[]) => {
+        setValidator(prevState => {
+            const entityIndex = prevState.config.findIndex((entity:any) => entity.id === selectedEntityId);
+            const newList = [...prevState.config];
+
+            newList[entityIndex] = {
+                ...newList[entityIndex],
+                attributes: attrs
+            };
+
+            return {
+                ...prevState,
+                config: newList
+            }
+        })
+    }
 
     useEffect(() => {
         getValidatorInfo(String(urlParams.id)).then((result) => {
-            setValidator({id: "",code: "",name: "",config: []});
+            setValidator({id: "", code: "", name: "", active: true, config: []});
             if (result.code == 200) {
                 setValidator(result.data);
             }
         }).catch((error) => {
-            setValidator({id: "",code: "",name: "",config: []});
+            setValidator({id: "", code: "", name: "", active: true, config: []});
         })
     }, []);
 
@@ -104,28 +78,38 @@ export default function ConfigPage() {
                     <Col span={6} className={styles.fullHeight}>
                         <Button>新加一行</Button>
                         <Button>导入</Button>
-                        <DragSortTable
-                            columns={columns}
-                            rowKey="key"
-                            search={false}
-                            pagination={false}
-                            dataSource={dataSource}
-                            dragSortKey="sort"
-                            onDragSortEnd={handleDragSortEnd}
-                            showHeader={false}
-                            options={false}
+                        <CustomTable
+                            data={validator.config}
+                            setDataFunc={setEntity}
+                            selectedId={selectedEntityId}
+                            setSelectedFunc={setSelectedEntityId}
+                            editableId={editableEntityId}
+                            setEditableFunc={setEditableEntityId}
                         />
                     </Col>
-                    <Col span={6}>attribute</Col>
+                    <Col span={6}>
+                        <Button>新加一行</Button>
+                        <Button>导入</Button>
+                        <CustomTable
+                            data={filterAttr()}
+                            setDataFunc={setAttr}
+                            selectedId={selectedAttrId}
+                            setSelectedFunc={setSelectedAttrId}
+                            editableId={editableAttrId}
+                            setEditableFunc={setEditableAttrId}
+                        />
+                    </Col>
                     <Col span={12}>
                         <Row>
                             <Col span={24}>
-                                validation rule
+                                <Button>新加一行</Button>
+                                <Button>导入</Button>
                             </Col>
                         </Row>
                         <Row>
                             <Col span={24}>
-                                repair rule
+                                <Button>新加一行</Button>
+                                <Button>导入</Button>
                             </Col>
                         </Row>
                         <Row>
