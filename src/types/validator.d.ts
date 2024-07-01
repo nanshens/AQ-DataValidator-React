@@ -20,20 +20,8 @@ export interface AttributeProps {
     name: string;
     active: boolean;
     type: string;
-    repairRule: RepairRuleProps[];
-    validationRule: ValidationRuleProps[];
-}
-
-export interface RepairRuleProps {
-    id: string;
-    code: string;
-    name: string;
-    active: boolean;
-    type: string;
-    length: string;
-    relateEntity: string;
-    relateAttribute: string;
-    collection: any[];
+    repairRules: RepairRuleProps[];
+    validationRules: ValidationRuleProps[];
 }
 
 export interface ValidationRuleProps {
@@ -42,8 +30,22 @@ export interface ValidationRuleProps {
     name: string;
     active: boolean;
     type: string;
-    length: string;
+    length: number;
     relateEntity: string;
     relateAttribute: string;
+    regexp: string;
     collection: any[];
 }
+
+export interface RepairRuleProps {
+    id: string;
+    code: string;
+    name: string;
+    active: boolean;
+    type: string;
+    isRegexpReplace: boolean;
+    replaceSource: string;
+    replaceTarget: string;
+    substringFormat: string;
+}
+

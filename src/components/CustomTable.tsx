@@ -9,6 +9,7 @@ import {TableItem} from "@/components/TableItem";
 export default function CustomTable(props:any) {
 
     const onDragEnd = ({ active, over }: DragEndEvent) => {
+        if (!props.setDataFunc) return;
         if (active.id !== over?.id) {
             if (props.editableId !== '') {
                 message.warning('编辑中不允许调整排序');
@@ -22,22 +23,14 @@ export default function CustomTable(props:any) {
         }
     };
 
-    // const getRowClassName = (record:any, index:any) => {
-    //     return selectedRowKeys.includes(record.id) ? 'ant-table-row-selected' : '';
-    // };
-    //
-    // const onRow = (record:any, rowIndex:any) => ({
-    //     onClick: () => {
-    //         setSelectedRowKeys([record.id]);
-    //     },
-    // });
-
     const getItemStyles = (id:string) => {
         return props.selectedId === id ? { color: "#e30a0a" } : {};
     };
 
     const click = (id: string) => {
-        props.setSelectedFunc(id)
+        if (props.setSelectedFunc) {
+            props.setSelectedFunc(id)
+        }
     }
 
     return (
