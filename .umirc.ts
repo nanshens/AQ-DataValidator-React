@@ -4,8 +4,9 @@ export default defineConfig({
   routes: [
     { path: "/", component: "index" },
     { path: "/config/:id", component: "config" },
-    { path: "/execute", component: "execute" },
-    { path: "/result", component: "result" },
+    { path: "/execute/:id", component: "execute" },
+    { path: "/result/:id", component: "result" },
+    { path: "/history/:id", component: "history" },
     { path: "/test", component: "test2" },
   ],
   npmClient: 'pnpm',
