@@ -274,6 +274,12 @@ export default function ConfigPage() {
     const uploadValidationRuleProps: UploadProps = {...uploadProps, action: ""}
     const uploadRepairRuleProps: UploadProps = {...uploadProps, action: ""}
 
+    const entityColumns:any[] = [
+        {"col": "code", "type": "string"},
+        {"col": "name", "type": "string"}
+    ]
+
+
     return (
     <div>
         <Layout className={styles.layoutStyle}>
@@ -304,6 +310,7 @@ export default function ConfigPage() {
                             setSelectedFunc={setActiveEntityId}
                             editableId={editableEntityId}
                             setEditableFunc={setEditableEntityId}
+                            columns={entityColumns}
                         />
                     </Col>
                     <Col span={6}>
