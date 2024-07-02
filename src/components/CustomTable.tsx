@@ -49,16 +49,22 @@ export default function CustomTable(props:any) {
         }
     }
 
-    const saveItem = (id: string) => {
-        console.log("deleteClick" + " " + id)
+    const saveItem = (editData: any) => {
+        if (props.mergeDataFunc) {
+            props.mergeDataFunc(editData)
+        }
+        if (props.setEditableFunc) {
+            props.setEditableFunc("")
+        }
     }
+
     return (
         <DndContext onDragEnd={onDragEnd} modifiers={[restrictToVerticalAxis]} collisionDetection={closestCenter}>
             <SortableContext items={props.data.map((i:any) => i.id)} strategy={verticalListSortingStrategy}>
                 {props.data.map((item:any) => (
                     <TableItem key={item.id} data={item} deleteClick={deleteClick} editClick={editClick} columns={props.columns}
                                isEditting={props.editableId === item.id} itemStyles={getItemStyles(item.id)}
-                               onClick={() => click(item.id)} cancelItem={() => cancelItem(item.id)} saveItem={() => saveItem(item.id)}
+                               onClick={() => click(item.id)} cancelItem={() => cancelItem(item.id)} saveItem={saveItem}
                     />
                 ))}
             </SortableContext>

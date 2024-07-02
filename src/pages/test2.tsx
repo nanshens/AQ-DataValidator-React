@@ -1,30 +1,18 @@
-import {EditableProTable, ProColumns} from "@ant-design/pro-components";
 import React, {useContext, useEffect, useMemo, useState} from 'react';
 import CustomTable from "@/components/CustomTable";
 import {getAllValidator} from "@/services/api";
+import Table from "@/pages/test";
 
 
 export default () => {
     const [dataSource, setDataSource] = useState<any[]>([]);
 
-    useEffect(() => {
-        setDataSource([
-            {
-                id: "1123"
-            },
-            {
-                id: "113323"
-            },
-            {
-                id: "1165723"
-            }
-        ])
-    }, []);
+    const data = [
+        { name: 'John Doe', age: 28 },
+        { name: 'Jane Smith', age: 32 },
+    ];
 
     return (
-        <CustomTable
-            data={dataSource}
-            setDataFunc={setDataSource}
-        />
+        <Table data={data} />
     );
 };

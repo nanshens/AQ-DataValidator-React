@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { HolderOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -11,6 +11,8 @@ export function TableItem(props:any) {
         transform,
         transition,
     } = useSortable({ id: props.data.id });
+
+    const [editData, setEditData] = useState(props.data);
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -44,11 +46,25 @@ export function TableItem(props:any) {
     const getComp = (column:any) => {
         if (props.isEditting) {
             if (column.type === 'string') {
-                return <Input key={props.data.id + column.col} size="small" value={props.data[column.col]}></Input>
+                return <Input key={props.data.id + column.col} size="small" value={editData[column.col]} onChange={(e) => handleInputChange(e, column.col)}></Input>
             }
         } else {
-            return <div key={props.data.id + column.col}>{props.data[column.col]}</div>
+            return <div key={props.data.id + column.col}>{editData[column.col]}</div>
         }
+    }
+
+    const handleInputChange = (e:any, column:string) => {
+        const { value } = e.target;
+        setEditData({...editData, [column]: value});
+    };
+
+    const cancelItem = () => {
+        props.cancelItem()
+        setEditData(props.data)
+    }
+
+    const saveItem = () => {
+        props.saveItem(editData)
     }
 
     return (
@@ -61,8 +77,8 @@ export function TableItem(props:any) {
                 <Flex gap="middle" style={{width: "100px"}}>
                     {props.isEditting ?
                         <Flex>
-                            <Button size="small" type="link" onClick={props.saveItem}>保存</Button>
-                            <Button size="small" type="link" onClick={props.cancelItem}>取消</Button>
+                            <Button size="small" type="link" onClick={saveItem}>保存</Button>
+                            <Button size="small" type="link" onClick={cancelItem}>取消</Button>
                         </Flex>
                         :
                         <Flex>

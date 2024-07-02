@@ -279,6 +279,74 @@ export default function ConfigPage() {
         {"col": "name", "type": "string"}
     ]
 
+    const attrColumns:any[] = [
+        {"col": "code", "type": "string"},
+        {"col": "name", "type": "string"},
+        {"col": "type", "type": "string"}
+    ]
+
+    const repairColumns:any[] = [
+        {"col": "code", "type": "string"},
+        {"col": "name", "type": "string"},
+        {"col": "type", "type": "string"},
+        {"col": "length", "type": "number"},
+        {"col": "relateEntity", "type": "string"},
+        {"col": "relateAttribute", "type": "string"},
+        {"col": "regexp", "type": "string"},
+        {"col": "collection", "type": "string"},
+    ]
+
+    const validationColumns:any[] = [
+        {"col": "code", "type": "string"},
+        {"col": "name", "type": "string"},
+        {"col": "type", "type": "string"},
+        {"col": "isRegexpReplace", "type": "boolean"},
+        {"col": "replaceSource", "type": "string"},
+        {"col": "replaceTarget", "type": "string"},
+        {"col": "substringFormat", "type": "string"}
+    ]
+
+    const mergeEntityData = (editData:EntityProps) => {
+        setValidator(prevState => {
+            const entityIndex = prevState.config.findIndex((entity) => entity.id === editData.id);
+            const newList = [...prevState.config];
+            newList[entityIndex] = {
+                ...newList[entityIndex],
+                code: editData.code,
+                name: editData.name,
+            };
+            return {
+                ...prevState,
+                config: newList
+            }
+        })
+    }
+
+    const mergeAttrData = (editData:AttributeProps) => {
+        setValidator(prevState => {
+            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === editData.id);
+            const newList = [...prevState.config];
+            newList[entityIndex].attributes[attrIndex] = {
+                ...newList[entityIndex].attributes[attrIndex],
+                code: editData.code,
+                name: editData.name,
+                type: editData.type
+            };
+            return {
+                ...prevState,
+                config: newList
+            }
+        })
+    }
+
+    const mergeValidationData = (editData:ValidationRuleProps) => {
+
+    }
+
+    const mergeRepairData = (editData:RepairRuleProps) => {
+
+    }
 
     return (
     <div>
@@ -311,6 +379,7 @@ export default function ConfigPage() {
                             editableId={editableEntityId}
                             setEditableFunc={setEditableEntityId}
                             columns={entityColumns}
+                            mergeDataFunc={mergeEntityData}
                         />
                     </Col>
                     <Col span={6}>
@@ -319,12 +388,15 @@ export default function ConfigPage() {
                             <Button icon={<UploadOutlined />}>导入属性</Button>
                         </Upload>
                         <CustomTable
+                            key={selectedEntityId}
                             data={filterAttr()}
                             setDataFunc={setAttrData}
                             selectedId={selectedAttrId}
                             setSelectedFunc={setActiveAttrId}
                             editableId={editableAttrId}
                             setEditableFunc={setEditableAttrId}
+                            columns={attrColumns}
+                            mergeDataFunc={mergeAttrData}
                         />
                     </Col>
                     <Col span={12}>
@@ -335,10 +407,13 @@ export default function ConfigPage() {
                                     <Button icon={<UploadOutlined />}>导入校验条件</Button>
                                 </Upload>
                                 <CustomTable
+                                    key={selectedAttrId}
                                     data={filterValidationRule()}
                                     setDataFunc={setValidationData}
-                                    editableId={editableRepairId}
-                                    setEditableFunc={setEditableRepairId}
+                                    editableId={editableValidationId}
+                                    setEditableFunc={setEditableValidationId}
+                                    columns={validationColumns}
+                                    mergeDataFunc={mergeValidationData}
                                 />
                             </Col>
                         </Row>
@@ -349,10 +424,13 @@ export default function ConfigPage() {
                                     <Button icon={<UploadOutlined />}>导入修复条件</Button>
                                 </Upload>
                                 <CustomTable
+                                    key={selectedAttrId}
                                     data={filterRepairRule()}
                                     setDataFunc={setRepairData}
-                                    editableId={editableValidationId}
-                                    setEditableFunc={setEditableValidationId}
+                                    editableId={editableRepairId}
+                                    setEditableFunc={setEditableRepairId}
+                                    columns={repairColumns}
+                                    mergeDataFunc={mergeRepairData}
                                 />
                             </Col>
                         </Row>
