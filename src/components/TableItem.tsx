@@ -4,7 +4,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { HolderOutlined, EditOutlined, DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import {Button, Col, Flex, Row, Input, Popconfirm} from "antd";
 import type { PopconfirmProps } from 'antd';
-
+import styles from './tableItem.less';
 
 export function TableItem(props:any) {
     const {
@@ -89,7 +89,7 @@ export function TableItem(props:any) {
                             <Button size="small" type="link" onClick={cancelItem}>取消</Button>
                         </Flex>
                         :
-                        <Flex>
+                        <Flex gap="middle">
                             <Popconfirm
                                 title="是否删除这行数据?"
                                 onConfirm={confirm}
@@ -97,9 +97,9 @@ export function TableItem(props:any) {
                                 cancelText="否"
                                 icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                             >
-                                <DeleteOutlined onClick={deleteClick}/>
+                                <DeleteOutlined className={styles.icon} onClick={deleteClick}/>
                             </Popconfirm>
-                            <EditOutlined onClick={editClick}/>
+                            <EditOutlined className={styles.icon} onClick={editClick}/>
                         </Flex>
                     }
                 </Flex>
