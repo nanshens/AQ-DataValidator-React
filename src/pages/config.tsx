@@ -3,7 +3,7 @@ const { Header, Footer, Sider, Content } = Layout;
 import styles from './config.less';
 import {useParams} from "react-router";
 import React, {useEffect, useState} from "react";
-import {getAllValidator, getValidatorInfo} from "@/services/api";
+import {getAllValidator, getValidator, saveValidator} from "@/services/api";
 import CustomTable from "@/components/CustomTable";
 import {AttributeProps, EntityProps, RepairRuleProps, ValidationRuleProps, ValidatorProps} from "@/types/validator";
 import { history } from 'umi';
@@ -126,7 +126,7 @@ export default function ConfigPage() {
     }
 
     useEffect(() => {
-        getValidatorInfo(String(urlParams.id)).then((result) => {
+        getValidator(String(urlParams.id)).then((result) => {
             setValidator({id: "", code: "", name: "", active: true, config: []});
             if (result.code == 200) {
                 setValidator(result.data);
@@ -141,7 +141,14 @@ export default function ConfigPage() {
     }
 
     const saveConfig = () => {
-
+        saveValidator(validator).then((result) => {
+            if (result.code == 200) {
+                setValidator(result.data);
+                message.success("保存成功!")
+            }
+        }).catch((error) => {
+            message.error("保存失败!")
+        })
     }
 
     const addEntity = () => {
@@ -454,6 +461,7 @@ export default function ConfigPage() {
                         <Button onClick={copyConfig}>复制配置</Button>
                         <Button onClick={() => history.push("/execute/" + urlParams.id)}>设置</Button>
                         <Button onClick={() => history.push("/history/" + urlParams.id)}>历史</Button>
+                        <Button onClick={saveConfig}>保存配置</Button>
                     </Col>
                 </Row>
             </Header>
@@ -529,11 +537,6 @@ export default function ConfigPage() {
                                     mergeDataFunc={mergeRepairData}
                                     deleteItemFunc={deleteRepairItem}
                                 />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col span={24}>
-                                <Button onClick={saveConfig}>保存配置</Button>
                             </Col>
                         </Row>
                     </Col>

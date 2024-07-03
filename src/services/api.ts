@@ -1,4 +1,5 @@
 import request from 'umi-request';
+import {ValidatorProps} from "@/types/validator";
 
 export async function getDict() {
     return request('/api/dict', {
@@ -33,15 +34,15 @@ export async function getRepairType() {
 }
 
 export async function getAllValidator() {
-    return request('/api/validator', {
+    return request('/api/validator/all', {
         method: 'GET',
     });
 }
 
-export async function saveValidator(validator:any) {
-    return request('/api/validator/save', {
+export async function saveValidator(validator:ValidatorProps) {
+    return request('/api/validator', {
         method: 'POST',
-        data: {'code': validator.code, 'name': validator.name },
+        data: validator,
     });
 }
 
@@ -52,19 +53,13 @@ export async function deleteValidator(id:string) {
     });
 }
 
-export async function getValidatorInfo(id:string) {
-    return request('/api/validator/info', {
-        method: 'POST',
-        data: {'id': id},
+export async function getValidator(id:string) {
+    return request('/api/validator', {
+        method: 'GET',
+        params: {'id': id},
     });
 }
 
-export async function saveValidatorInfo(validatorInfo:any) {
-    return request('/api/validator/info', {
-        method: 'POST',
-        data: {'validatorInfos': validatorInfo },
-    });
-}
 
 export async function copyValidatorInfo(id:string) {
     return request('/api/validator/copy', {
