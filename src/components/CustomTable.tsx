@@ -65,6 +65,7 @@ export default function CustomTable(props:any) {
                     <TableItem key={item.id} data={item} deleteClick={deleteClick} editClick={editClick} columns={props.columns}
                                isEditting={props.editableId === item.id} itemStyles={getItemStyles(item.id)}
                                onClick={() => click(item.id)} cancelItem={() => cancelItem(item.id)} saveItem={saveItem}
+                               deleteItem={props.deleteItemFunc}
                     />
                 ))}
             </SortableContext>

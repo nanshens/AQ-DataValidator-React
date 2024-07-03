@@ -39,17 +39,37 @@ export default function ConfigPage() {
         setValidator({...validator, config: entity})
     }
 
+    const filterEntity = ():EntityProps[] => {
+        return validator.config.filter((i) => i.active);
+    }
+
     const filterAttr = ():AttributeProps[] => {
-        const entities: any[] = validator.config.filter((i:any) => i.id === selectedEntityId);
+        const entities = validator.config.filter((i) => i.active && i.id === selectedEntityId);
         if (entities.length == 1) {
-            return entities[0].attributes;
+            return entities[0].attributes.filter((i) => i.active);
+        }
+        return []
+    }
+
+    const filterValidationRule = ():ValidationRuleProps[] => {
+        const attr = findAttr()
+        if (attr != null){
+            return attr.validationRules.filter((i) => i.active);
+        }
+        return []
+    }
+
+    const filterRepairRule = ():RepairRuleProps[] => {
+        const attr = findAttr()
+        if (attr != null){
+            return attr.repairRules.filter((i) => i.active);
         }
         return []
     }
 
     const setAttrData = (attrs: AttributeProps[]) => {
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity:any) => entity.id === selectedEntityId);
+            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
             const newList = [...prevState.config];
             newList[entityIndex] = {
                 ...newList[entityIndex],
@@ -95,30 +115,14 @@ export default function ConfigPage() {
     }
 
     const findAttr = () => {
-        const entities = validator.config.filter((i:any) => i.id === selectedEntityId);
+        const entities = validator.config.filter((i) => i.active && i.id === selectedEntityId);
         if (entities.length == 1) {
-            const attributes = entities[0].attributes.filter((i:any) => i.id === selectedAttrId);
+            const attributes = entities[0].attributes.filter((i) => i.active && i.id === selectedAttrId);
             if (attributes.length == 1) {
                 return attributes[0]
             }
         }
         return null;
-    }
-
-    const filterValidationRule = ():ValidationRuleProps[] => {
-        const attr = findAttr()
-        if (attr != null){
-            return attr.validationRules
-        }
-        return []
-    }
-
-    const filterRepairRule = ():RepairRuleProps[] => {
-        const attr = findAttr()
-        if (attr != null){
-            return attr.repairRules
-        }
-        return []
     }
 
     useEffect(() => {
@@ -170,7 +174,7 @@ export default function ConfigPage() {
         }
 
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity:any) => entity.id === selectedEntityId);
+            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
             const newList = [...prevState.config];
             newList[entityIndex] = {
                 ...newList[entityIndex],
@@ -341,11 +345,100 @@ export default function ConfigPage() {
     }
 
     const mergeValidationData = (editData:ValidationRuleProps) => {
-
+        setValidator(prevState => {
+            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
+            const validationIndex = prevState.config[entityIndex].attributes[attrIndex].validationRules.findIndex((entity) => entity.id === editData.id);
+            const newList = [...prevState.config];
+            newList[entityIndex].attributes[attrIndex].validationRules[validationIndex] = {
+                ...newList[entityIndex].attributes[attrIndex].validationRules[validationIndex],
+                code: editData.code,
+                name: editData.name,
+                type: editData.type,
+                length: editData.length,
+                relateEntity: editData.relateEntity,
+                relateAttribute: editData.relateAttribute,
+                regexp: editData.regexp,
+                collection: editData.collection,
+            };
+            return { ...prevState, config: newList }
+        })
     }
 
     const mergeRepairData = (editData:RepairRuleProps) => {
+        setValidator(prevState => {
+            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
+            const repairIndex = prevState.config[entityIndex].attributes[attrIndex].repairRules.findIndex((entity) => entity.id === editData.id);
+            const newList = [...prevState.config];
+            newList[entityIndex].attributes[attrIndex].repairRules[repairIndex] = {
+                ...newList[entityIndex].attributes[attrIndex].repairRules[repairIndex],
+                code: editData.code,
+                name: editData.name,
+                type: editData.type,
+                isRegexpReplace: editData.isRegexpReplace,
+                replaceSource: editData.replaceSource,
+                replaceTarget: editData.replaceTarget,
+                substringFormat: editData.substringFormat,
+            };
+            return { ...prevState, config: newList }
+        })
+    }
 
+    const deleteEntityItem = (id: string) => {
+        setValidator(prevState => {
+            const entityIndex = prevState.config.findIndex((entity) => entity.id === id);
+            const newList = [...prevState.config];
+            newList[entityIndex] = {
+                ...newList[entityIndex],
+                active: false
+            };
+            return { ...prevState, config: newList }
+        })
+    }
+
+    const deleteAttrItem = (id: string) => {
+        setValidator(prevState => {
+            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === id);
+            const newList = [...prevState.config];
+            newList[entityIndex].attributes[attrIndex] = {
+                ...newList[entityIndex].attributes[attrIndex],
+                active: false,
+            };
+            return {
+                ...prevState,
+                config: newList
+            }
+        })
+    }
+
+    const deleteValidationItem = (id: string) => {
+        setValidator(prevState => {
+            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
+            const validationIndex = prevState.config[entityIndex].attributes[attrIndex].validationRules.findIndex((entity) => entity.id === id);
+            const newList = [...prevState.config];
+            newList[entityIndex].attributes[attrIndex].validationRules[validationIndex] = {
+                ...newList[entityIndex].attributes[attrIndex].validationRules[validationIndex],
+                active: false,
+            };
+            return { ...prevState, config: newList }
+        })
+    }
+
+    const deleteRepairItem = (id: string) => {
+        setValidator(prevState => {
+            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
+            const repairIndex = prevState.config[entityIndex].attributes[attrIndex].repairRules.findIndex((entity) => entity.id === id);
+            const newList = [...prevState.config];
+            newList[entityIndex].attributes[attrIndex].repairRules[repairIndex] = {
+                ...newList[entityIndex].attributes[attrIndex].repairRules[repairIndex],
+                active: false,
+            };
+            return { ...prevState, config: newList }
+        })
     }
 
     return (
@@ -372,7 +465,7 @@ export default function ConfigPage() {
                             <Button icon={<UploadOutlined />}>导入实体</Button>
                         </Upload>
                         <CustomTable
-                            data={validator.config}
+                            data={filterEntity()}
                             setDataFunc={setEntityData}
                             selectedId={selectedEntityId}
                             setSelectedFunc={setActiveEntityId}
@@ -380,6 +473,7 @@ export default function ConfigPage() {
                             setEditableFunc={setEditableEntityId}
                             columns={entityColumns}
                             mergeDataFunc={mergeEntityData}
+                            deleteItemFunc={deleteEntityItem}
                         />
                     </Col>
                     <Col span={6}>
@@ -397,6 +491,7 @@ export default function ConfigPage() {
                             setEditableFunc={setEditableAttrId}
                             columns={attrColumns}
                             mergeDataFunc={mergeAttrData}
+                            deleteItemFunc={deleteAttrItem}
                         />
                     </Col>
                     <Col span={12}>
@@ -414,6 +509,7 @@ export default function ConfigPage() {
                                     setEditableFunc={setEditableValidationId}
                                     columns={validationColumns}
                                     mergeDataFunc={mergeValidationData}
+                                    deleteItemFunc={deleteValidationItem}
                                 />
                             </Col>
                         </Row>
@@ -431,6 +527,7 @@ export default function ConfigPage() {
                                     setEditableFunc={setEditableRepairId}
                                     columns={repairColumns}
                                     mergeDataFunc={mergeRepairData}
+                                    deleteItemFunc={deleteRepairItem}
                                 />
                             </Col>
                         </Row>

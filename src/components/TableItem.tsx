@@ -1,8 +1,11 @@
 import React, {useState} from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { HolderOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import {Button, Col, Flex, Row, Input} from "antd";
+import { HolderOutlined, EditOutlined, DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import {Button, Col, Flex, Row, Input, Popconfirm} from "antd";
+import type { PopconfirmProps } from 'antd';
+
+
 export function TableItem(props:any) {
     const {
         attributes,
@@ -67,6 +70,11 @@ export function TableItem(props:any) {
         props.saveItem(editData)
     }
 
+    const confirm: PopconfirmProps['onConfirm'] = (e) => {
+        props.deleteItem(props.data.id);
+    };
+
+
     return (
         <div style={style} onClick={props.onClick}>
             <Flex gap="middle" justify={"flex-start"}>
@@ -82,7 +90,15 @@ export function TableItem(props:any) {
                         </Flex>
                         :
                         <Flex>
-                            <DeleteOutlined onClick={deleteClick}/>
+                            <Popconfirm
+                                title="是否删除这行数据?"
+                                onConfirm={confirm}
+                                okText="是"
+                                cancelText="否"
+                                icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                            >
+                                <DeleteOutlined onClick={deleteClick}/>
+                            </Popconfirm>
                             <EditOutlined onClick={editClick}/>
                         </Flex>
                     }
