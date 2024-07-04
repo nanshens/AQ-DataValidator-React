@@ -1,12 +1,14 @@
 import yayJpg from '../assets/yay.jpg';
-import {Button, Col, Input, Layout, List, Row, Typography} from "antd";
+import {Button, Col, Input, Layout, List, message, Row, Typography} from "antd";
 import styles from './index.less';
 const { Title } = Typography;
 import type { SearchProps } from 'antd/es/input/Search';
 import {useEffect, useState} from "react";
-import {getAllValidator} from "@/services/api";
+import {getAllValidator, saveValidator} from "@/services/api";
 const { Search } = Input;
 import { history } from 'umi';
+import { v4 as uuid4 } from 'uuid';
+import {AttributeProps, ValidatorProps} from "@/types/validator";
 const { Header, Footer, Sider, Content } = Layout;
 export default function IndexPage() {
     const [validators, setValidators] = useState([]);
@@ -29,8 +31,28 @@ export default function IndexPage() {
             setData([]);
         })
     }, []);
-    const go_config = (validator:any) => {
+    const goConfig = (validator:any) => {
         history.push('/config/' + validator.id)
+    }
+
+    const addValidator = () => {
+        const validator = {
+            id: "NEW-" + uuid4(),
+            code: "new-validator",
+            name: "new-validator",
+            active: true,
+            config: []
+        }
+        saveValidator(validator).then((result) => {
+            if (result.code == 200) {
+                message.success("创建成功! 正在跳转...").then(e => {
+                    history.push('/config/' + result.data.id)
+                })
+            }
+        }).catch((error) => {
+            message.error("创建失败!")
+        })
+
     }
 
     return (
@@ -49,7 +71,7 @@ export default function IndexPage() {
                             bordered
                             dataSource={data}
                             renderItem={(item:any) => (
-                                <List.Item onClick={() => go_config(item)}>
+                                <List.Item onClick={() => goConfig(item)}>
                                     {item.code} - {item.name}
                                 </List.Item>
                             )}
@@ -63,7 +85,7 @@ export default function IndexPage() {
                         </Row>
                         <Row>
                             <Col span={24}>
-                                <Button type="dashed">添加校验器</Button>
+                                <Button type="dashed" onClick={addValidator}>添加校验器</Button>
                             </Col>
                         </Row>
 

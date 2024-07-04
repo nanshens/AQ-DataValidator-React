@@ -10,6 +10,7 @@ import { history } from 'umi';
 import { v4 as uuid4 } from 'uuid';
 import { UploadOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
+import {AttributeType, RepairRuleType, ValidationRuleType} from "@/types/enums";
 
 
 export default function ConfigPage() {
@@ -293,28 +294,28 @@ export default function ConfigPage() {
     const attrColumns:any[] = [
         {"col": "code", "type": "string"},
         {"col": "name", "type": "string"},
-        {"col": "type", "type": "string"}
-    ]
-
-    const repairColumns:any[] = [
-        {"col": "code", "type": "string"},
-        {"col": "name", "type": "string"},
-        {"col": "type", "type": "string"},
-        {"col": "length", "type": "number"},
-        {"col": "relateEntity", "type": "string"},
-        {"col": "relateAttribute", "type": "string"},
-        {"col": "regexp", "type": "string"},
-        {"col": "collection", "type": "string"},
+        {"col": "type", "type": "select", "options": Object.keys(AttributeType).map(val => ({"value": AttributeType[val as keyof typeof AttributeType], "label": val}))}
     ]
 
     const validationColumns:any[] = [
         {"col": "code", "type": "string"},
         {"col": "name", "type": "string"},
-        {"col": "type", "type": "string"},
+        {"col": "type", "type": "select", "options": Object.keys(ValidationRuleType).map(val => ({"value": ValidationRuleType[val as keyof typeof ValidationRuleType], "label": val}))},
         {"col": "isRegexpReplace", "type": "boolean"},
         {"col": "replaceSource", "type": "string"},
         {"col": "replaceTarget", "type": "string"},
         {"col": "substringFormat", "type": "string"}
+    ]
+
+    const repairColumns:any[] = [
+        {"col": "code", "type": "string"},
+        {"col": "name", "type": "string"},
+        {"col": "type", "type": "select", "options": Object.keys(RepairRuleType).map(val => ({"value": RepairRuleType[val as keyof typeof RepairRuleType], "label": val}))},
+        {"col": "length", "type": "number"},
+        {"col": "relateEntity", "type": "string"},
+        {"col": "relateAttribute", "type": "string"},
+        {"col": "regexp", "type": "string"},
+        {"col": "collection", "type": "string"},
     ]
 
     const mergeEntityData = (editData:EntityProps) => {
@@ -458,9 +459,8 @@ export default function ConfigPage() {
                     <Col span={12}>
                         <Button onClick={() => history.push("/")}>主页</Button>
                         <Button onClick={() => history.push("/execute/" + urlParams.id)}>执行</Button>
-                        <Button onClick={copyConfig}>复制配置</Button>
-                        <Button onClick={() => history.push("/execute/" + urlParams.id)}>设置</Button>
                         <Button onClick={() => history.push("/history/" + urlParams.id)}>历史</Button>
+                        <Button onClick={copyConfig}>复制配置</Button>
                         <Button onClick={saveConfig}>保存配置</Button>
                     </Col>
                 </Row>

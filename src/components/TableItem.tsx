@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { HolderOutlined, EditOutlined, DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import {Button, Col, Flex, Row, Input, Popconfirm} from "antd";
+import {Button, Col, Flex, Row, Input, Popconfirm, Select, InputNumber} from "antd";
 import type { PopconfirmProps } from 'antd';
 import styles from './tableItem.less';
 
@@ -50,11 +50,23 @@ export function TableItem(props:any) {
         if (props.isEditting) {
             if (column.type === 'string') {
                 return <Input key={props.data.id + column.col} size="small" value={editData[column.col]} onChange={(e) => handleInputChange(e, column.col)}></Input>
+            } else if (column.type === 'select') {
+                return <Select key={props.data.id + column.col} size="small" value={editData[column.col]} onChange={(e) => handleSelectChange(e, column.col)} options={column.options} />
+            } else if (column.type === 'number') {
+                return <InputNumber key={props.data.id + column.col} size="small" value={editData[column.col]} onChange={(e) => handleNumberChange(e, column.col)} />
             }
         } else {
             return <div key={props.data.id + column.col}>{editData[column.col]}</div>
         }
     }
+
+    const handleNumberChange = (value:any, column:string) => {
+        setEditData({...editData, [column]: value});
+    };
+
+    const handleSelectChange = (value:any, column:string) => {
+        setEditData({...editData, [column]: value});
+    };
 
     const handleInputChange = (e:any, column:string) => {
         const { value } = e.target;
@@ -79,17 +91,17 @@ export function TableItem(props:any) {
         <div style={style} onClick={props.onClick}>
             <Flex gap="middle" justify={"flex-start"}>
                 <Button type="text" size="large" icon={<HolderOutlined />} style={{ cursor: 'move', width: '60px' }} ref={setNodeRef} {...attributes} {...listeners}/>
-                <Flex gap="middle" style={{width: "100%"}}>
+                <Flex gap="small" style={{width: "100%"}}>
                     {props.columns && (props.columns.map((item:any) => getComp(item)))}
                 </Flex>
-                <Flex gap="middle" style={{width: "100px"}}>
+                <Flex gap="small" style={{width: "100px"}}>
                     {props.isEditting ?
                         <Flex>
                             <Button size="small" type="link" onClick={saveItem}>保存</Button>
                             <Button size="small" type="link" onClick={cancelItem}>取消</Button>
                         </Flex>
                         :
-                        <Flex gap="middle">
+                        <Flex gap="small">
                             <Popconfirm
                                 title="是否删除这行数据?"
                                 onConfirm={confirm}
