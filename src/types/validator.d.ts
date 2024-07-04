@@ -3,7 +3,7 @@ export interface ValidatorProps {
     code: string;
     name: string;
     active: boolean;
-    config: EntityProps[];
+    entities: EntityProps[];
 }
 
 export interface EntityProps {

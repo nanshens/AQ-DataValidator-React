@@ -16,7 +16,7 @@ import {AttributeType, RepairRuleType, ValidationRuleType} from "@/types/enums";
 export default function ConfigPage() {
     const urlParams  = useParams();
     const [validator, setValidator] = useState<ValidatorProps>({
-        id: "", code: "", name: "", active: true, config: []
+        id: "", code: "", name: "", active: true, entities: []
     });
     const [selectedEntityId, setSelectedEntityId] = useState<string>('');
     const [editableEntityId, setEditableEntityId] = useState<string>('');
@@ -37,15 +37,15 @@ export default function ConfigPage() {
     }
 
     const setEntityData = (entity: EntityProps[]) => {
-        setValidator({...validator, config: entity})
+        setValidator({...validator, entities: entity})
     }
 
     const filterEntity = ():EntityProps[] => {
-        return validator.config.filter((i) => i.active);
+        return validator.entities.filter((i) => i.active);
     }
 
     const filterAttr = ():AttributeProps[] => {
-        const entities = validator.config.filter((i) => i.active && i.id === selectedEntityId);
+        const entities = validator.entities.filter((i) => i.active && i.id === selectedEntityId);
         if (entities.length == 1) {
             return entities[0].attributes.filter((i) => i.active);
         }
@@ -70,53 +70,44 @@ export default function ConfigPage() {
 
     const setAttrData = (attrs: AttributeProps[]) => {
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === selectedEntityId);
+            const newList = [...prevState.entities];
             newList[entityIndex] = {
                 ...newList[entityIndex],
                 attributes: attrs
             };
-            return {
-                ...prevState,
-                config: newList
-            }
+            return {...prevState,entities: newList}
         })
     }
 
     const setValidationData = (validationRules: ValidationRuleProps[]) => {
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
-            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.entities[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
+            const newList = [...prevState.entities];
             newList[entityIndex].attributes[attrIndex] = {
                 ...newList[entityIndex].attributes[attrIndex],
                 validationRules: validationRules
             };
-            return {
-                ...prevState,
-                config: newList
-            }
+            return {...prevState,entities: newList}
         })
     }
 
     const setRepairData = (repairRuleProps: RepairRuleProps[]) => {
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
-            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.entities[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
+            const newList = [...prevState.entities];
             newList[entityIndex].attributes[attrIndex] = {
                 ...newList[entityIndex].attributes[attrIndex],
                 repairRules: repairRuleProps
             };
-            return {
-                ...prevState,
-                config: newList
-            }
+            return {...prevState,entities: newList}
         })
     }
 
     const findAttr = () => {
-        const entities = validator.config.filter((i) => i.active && i.id === selectedEntityId);
+        const entities = validator.entities.filter((i) => i.active && i.id === selectedEntityId);
         if (entities.length == 1) {
             const attributes = entities[0].attributes.filter((i) => i.active && i.id === selectedAttrId);
             if (attributes.length == 1) {
@@ -128,12 +119,12 @@ export default function ConfigPage() {
 
     useEffect(() => {
         getValidator(String(urlParams.id)).then((result) => {
-            setValidator({id: "", code: "", name: "", active: true, config: []});
+            setValidator({id: "", code: "", name: "", active: true, entities: []});
             if (result.code == 200) {
                 setValidator(result.data);
             }
         }).catch((error) => {
-            setValidator({id: "", code: "", name: "", active: true, config: []});
+            setValidator({id: "", code: "", name: "", active: true, entities: []});
         })
     }, []);
 
@@ -161,7 +152,7 @@ export default function ConfigPage() {
             active: true,
             attributes: []
         }
-        setValidator({...validator, config: [...validator.config, newEntity]});
+        setValidator({...validator, entities: [...validator.entities, newEntity]});
         setSelectedEntityId(uuid)
     }
 
@@ -182,16 +173,13 @@ export default function ConfigPage() {
         }
 
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === selectedEntityId);
+            const newList = [...prevState.entities];
             newList[entityIndex] = {
                 ...newList[entityIndex],
                 attributes: [...newList[entityIndex].attributes, newAttr]
             };
-            return {
-                ...prevState,
-                config: newList
-            }
+            return {...prevState, entities: newList}
         })
         setSelectedAttrId(uuid)
     }
@@ -216,17 +204,14 @@ export default function ConfigPage() {
         }
 
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
-            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.entities[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
+            const newList = [...prevState.entities];
             newList[entityIndex].attributes[attrIndex] = {
                 ...newList[entityIndex].attributes[attrIndex],
                 validationRules: [...newList[entityIndex].attributes[attrIndex].validationRules, newRule]
             };
-            return {
-                ...prevState,
-                config: newList
-            }
+            return {...prevState, entities: newList}
         })
     }
 
@@ -249,17 +234,14 @@ export default function ConfigPage() {
         }
 
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
-            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.entities[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
+            const newList = [...prevState.entities];
             newList[entityIndex].attributes[attrIndex] = {
                 ...newList[entityIndex].attributes[attrIndex],
                 repairRules: [...newList[entityIndex].attributes[attrIndex].repairRules, newRule]
             };
-            return {
-                ...prevState,
-                config: newList
-            }
+            return {...prevState, entities: newList}
         })
     }
 
@@ -320,44 +302,38 @@ export default function ConfigPage() {
 
     const mergeEntityData = (editData:EntityProps) => {
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === editData.id);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === editData.id);
+            const newList = [...prevState.entities];
             newList[entityIndex] = {
                 ...newList[entityIndex],
                 code: editData.code,
                 name: editData.name,
             };
-            return {
-                ...prevState,
-                config: newList
-            }
+            return {...prevState, entities: newList}
         })
     }
 
     const mergeAttrData = (editData:AttributeProps) => {
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
-            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === editData.id);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.entities[entityIndex].attributes.findIndex((entity) => entity.id === editData.id);
+            const newList = [...prevState.entities];
             newList[entityIndex].attributes[attrIndex] = {
                 ...newList[entityIndex].attributes[attrIndex],
                 code: editData.code,
                 name: editData.name,
                 type: editData.type
             };
-            return {
-                ...prevState,
-                config: newList
-            }
+            return {...prevState, entities: newList}
         })
     }
 
     const mergeValidationData = (editData:ValidationRuleProps) => {
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
-            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
-            const validationIndex = prevState.config[entityIndex].attributes[attrIndex].validationRules.findIndex((entity) => entity.id === editData.id);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.entities[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
+            const validationIndex = prevState.entities[entityIndex].attributes[attrIndex].validationRules.findIndex((entity) => entity.id === editData.id);
+            const newList = [...prevState.entities];
             newList[entityIndex].attributes[attrIndex].validationRules[validationIndex] = {
                 ...newList[entityIndex].attributes[attrIndex].validationRules[validationIndex],
                 code: editData.code,
@@ -369,16 +345,16 @@ export default function ConfigPage() {
                 regexp: editData.regexp,
                 collection: editData.collection,
             };
-            return { ...prevState, config: newList }
+            return { ...prevState, entities: newList }
         })
     }
 
     const mergeRepairData = (editData:RepairRuleProps) => {
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
-            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
-            const repairIndex = prevState.config[entityIndex].attributes[attrIndex].repairRules.findIndex((entity) => entity.id === editData.id);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.entities[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
+            const repairIndex = prevState.entities[entityIndex].attributes[attrIndex].repairRules.findIndex((entity) => entity.id === editData.id);
+            const newList = [...prevState.entities];
             newList[entityIndex].attributes[attrIndex].repairRules[repairIndex] = {
                 ...newList[entityIndex].attributes[attrIndex].repairRules[repairIndex],
                 code: editData.code,
@@ -389,63 +365,60 @@ export default function ConfigPage() {
                 replaceTarget: editData.replaceTarget,
                 substringFormat: editData.substringFormat,
             };
-            return { ...prevState, config: newList }
+            return { ...prevState, entities: newList }
         })
     }
 
     const deleteEntityItem = (id: string) => {
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === id);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === id);
+            const newList = [...prevState.entities];
             newList[entityIndex] = {
                 ...newList[entityIndex],
                 active: false
             };
-            return { ...prevState, config: newList }
+            return { ...prevState, entities: newList }
         })
     }
 
     const deleteAttrItem = (id: string) => {
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
-            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === id);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.entities[entityIndex].attributes.findIndex((entity) => entity.id === id);
+            const newList = [...prevState.entities];
             newList[entityIndex].attributes[attrIndex] = {
                 ...newList[entityIndex].attributes[attrIndex],
                 active: false,
             };
-            return {
-                ...prevState,
-                config: newList
-            }
+            return {...prevState, entities: newList}
         })
     }
 
     const deleteValidationItem = (id: string) => {
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
-            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
-            const validationIndex = prevState.config[entityIndex].attributes[attrIndex].validationRules.findIndex((entity) => entity.id === id);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.entities[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
+            const validationIndex = prevState.entities[entityIndex].attributes[attrIndex].validationRules.findIndex((entity) => entity.id === id);
+            const newList = [...prevState.entities];
             newList[entityIndex].attributes[attrIndex].validationRules[validationIndex] = {
                 ...newList[entityIndex].attributes[attrIndex].validationRules[validationIndex],
                 active: false,
             };
-            return { ...prevState, config: newList }
+            return { ...prevState, entities: newList }
         })
     }
 
     const deleteRepairItem = (id: string) => {
         setValidator(prevState => {
-            const entityIndex = prevState.config.findIndex((entity) => entity.id === selectedEntityId);
-            const attrIndex = prevState.config[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
-            const repairIndex = prevState.config[entityIndex].attributes[attrIndex].repairRules.findIndex((entity) => entity.id === id);
-            const newList = [...prevState.config];
+            const entityIndex = prevState.entities.findIndex((entity) => entity.id === selectedEntityId);
+            const attrIndex = prevState.entities[entityIndex].attributes.findIndex((entity) => entity.id === selectedAttrId);
+            const repairIndex = prevState.entities[entityIndex].attributes[attrIndex].repairRules.findIndex((entity) => entity.id === id);
+            const newList = [...prevState.entities];
             newList[entityIndex].attributes[attrIndex].repairRules[repairIndex] = {
                 ...newList[entityIndex].attributes[attrIndex].repairRules[repairIndex],
                 active: false,
             };
-            return { ...prevState, config: newList }
+            return { ...prevState, entities: newList }
         })
     }
 

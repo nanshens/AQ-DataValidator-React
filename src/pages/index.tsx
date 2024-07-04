@@ -41,7 +41,7 @@ export default function IndexPage() {
             code: "new-validator",
             name: "new-validator",
             active: true,
-            config: []
+            entities: []
         }
         saveValidator(validator).then((result) => {
             if (result.code == 200) {
