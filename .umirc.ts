@@ -4,7 +4,7 @@ export default defineConfig({
   routes: [
     { path: "/", component: "index" },
     { path: "/config/:id", component: "config" },
-    { path: "/execute/:id", component: "execute" },
+    { path: "/executor/:id", component: "executor" },
     { path: "/result/:id", component: "result" },
     { path: "/history/:id", component: "history" },
     { path: "/test", component: "test2" },

@@ -1,9 +1,9 @@
-import {Button, Col, Layout, message, Row, Upload} from "antd";
+import {Button, Col, Layout, message, Modal, Row, Upload} from "antd";
 const { Header, Footer, Sider, Content } = Layout;
 import styles from './config.less';
 import {useParams} from "react-router";
 import React, {useEffect, useState} from "react";
-import {getAllValidator, getValidator, saveValidator} from "@/services/api";
+import {getAllExecutors, getAllValidator, getValidator, saveExecutor, saveValidator} from "@/services/api";
 import CustomTable from "@/components/CustomTable";
 import {AttributeProps, EntityProps, RepairRuleProps, ValidationRuleProps, ValidatorProps} from "@/types/validator";
 import { history } from 'umi';
@@ -11,6 +11,7 @@ import { v4 as uuid4 } from 'uuid';
 import { UploadOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 import {AttributeType, RepairRuleType, ValidationRuleType} from "@/types/enums";
+import {ExecutorProps} from "@/types/executor";
 
 
 export default function ConfigPage() {
@@ -18,6 +19,7 @@ export default function ConfigPage() {
     const [validator, setValidator] = useState<ValidatorProps>({
         id: "", code: "", name: "", active: true, entities: []
     });
+    const [executors, setExecutors] = useState<ExecutorProps[]>([]);
     const [selectedEntityId, setSelectedEntityId] = useState<string>('');
     const [editableEntityId, setEditableEntityId] = useState<string>('');
     const [selectedAttrId, setSelectedAttrId] = useState<string>('');
@@ -26,6 +28,7 @@ export default function ConfigPage() {
     const [editableRepairId, setEditableRepairId] = useState<string>('');
     const [selectedValidationId, setSelectedValidationId] = useState<string>('');
     const [editableValidationId, setEditableValidationId] = useState<string>('');
+    const [showAllExecutorsModal, setShowAllExecutorsModal] = useState(false);
 
     const setActiveEntityId = (id: string) => {
         setSelectedEntityId(id);
@@ -125,6 +128,14 @@ export default function ConfigPage() {
             }
         }).catch((error) => {
             setValidator({id: "", code: "", name: "", active: true, entities: []});
+        })
+        getAllExecutors(String(urlParams.id)).then((result) => {
+            setExecutors([]);
+            if (result.code == 200) {
+                setExecutors(result.data);
+            }
+        }).catch((error) => {
+            setExecutors([]);
         })
     }, []);
 
@@ -422,6 +433,32 @@ export default function ConfigPage() {
         })
     }
 
+    const showAllExecutors = () => {
+    //     todo: 模态框 显示所有执行器
+    }
+
+    const createExecutor = () => {
+        const executor = {
+            id: "NEW-" + uuid4(),
+            code: validator.code + "-" + (new Date()).toISOString(),
+            name: validator.code + "-" + (new Date()).toISOString(),
+            active: true,
+            execute_time: '',
+            validator_id: validator.id,
+            match_entities: [],
+            config: []
+        }
+        saveExecutor(executor).then((result) => {
+            if (result.code == 200) {
+                message.success("创建成功! 正在跳转...").then(e => {
+                    history.push('/executor/' + result.data.id)
+                })
+            }
+        }).catch((error) => {
+            message.error("创建失败!")
+        })
+    }
+
     return (
     <div>
         <Layout className={styles.layoutStyle}>
@@ -431,8 +468,8 @@ export default function ConfigPage() {
                     <Col span={6}>{validator.code} - {validator.name}</Col>
                     <Col span={12}>
                         <Button onClick={() => history.push("/")}>主页</Button>
-                        <Button onClick={() => history.push("/execute/" + urlParams.id)}>执行</Button>
-                        <Button onClick={() => history.push("/history/" + urlParams.id)}>历史</Button>
+                        <Button onClick={createExecutor}>创建执行器</Button>
+                        <Button onClick={() => setShowAllExecutorsModal(true)}>其他执行器</Button>
                         <Button onClick={copyConfig}>复制配置</Button>
                         <Button onClick={saveConfig}>保存配置</Button>
                     </Col>
@@ -516,6 +553,11 @@ export default function ConfigPage() {
                 </Row>
             </Content>
         </Layout>
+        <Modal title="执行器" open={showAllExecutorsModal} footer={null} closable={false} onCancel={() => setShowAllExecutorsModal(false)}>
+            {executors.map((executor, index) => (
+                <p onClick={() => history.push("/executor/" + executor.id )}>{executor.code} - {executor.name}</p>
+            ))}
+        </Modal>
     </div>
   );
 };

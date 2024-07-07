@@ -1,5 +1,6 @@
 import request from 'umi-request';
 import {ValidatorProps} from "@/types/validator";
+import {ExecutorProps} from "@/types/executor";
 
 export async function getDict() {
     return request('/api/dict', {
@@ -86,5 +87,33 @@ export async function getExecuteInfo(executeInfo:any) {
     return request('/api/execute/info/save', {
         method: 'POST',
         data: {'executeInfo': executeInfo},
+    });
+}
+
+export async function saveExecutor(executor:ExecutorProps) {
+    return request('/api/executor', {
+        method: 'POST',
+        data: executor,
+    });
+}
+
+export async function getExecutor(id:string) {
+    return request('/api/executor', {
+        method: 'GET',
+        params: {'id': id},
+    });
+}
+
+export async function getAllExecutors(id:string) {
+    return request('/api/executor/all', {
+        method: 'GET',
+        params: {'id': id},
+    });
+}
+
+export async function getFileEntities(id:string) {
+    return request('/api/executor/file/entities', {
+        method: 'POST',
+        data: {id: id},
     });
 }
