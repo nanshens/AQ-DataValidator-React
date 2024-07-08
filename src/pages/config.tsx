@@ -294,22 +294,39 @@ export default function ConfigPage() {
         {"col": "code", "type": "string"},
         {"col": "name", "type": "string"},
         {"col": "type", "type": "select", "options": Object.keys(ValidationRuleType).map(val => ({"value": ValidationRuleType[val as keyof typeof ValidationRuleType], "label": val}))},
-        {"col": "isRegexpReplace", "type": "boolean"},
-        {"col": "replaceSource", "type": "string"},
-        {"col": "replaceTarget", "type": "string"},
-        {"col": "substringFormat", "type": "string"}
+        {"col": "length", "type": "number", "parentColumn": "type"},
+        {"col": "relateEntity", "type": "string", "parentColumn": "type"},
+        {"col": "relateAttribute", "type": "string", "parentColumn": "type"},
+        {"col": "regexp", "type": "string", "parentColumn": "type"},
+        {"col": "collection", "type": "string", "parentColumn": "type"},
     ]
 
     const repairColumns:any[] = [
         {"col": "code", "type": "string"},
         {"col": "name", "type": "string"},
         {"col": "type", "type": "select", "options": Object.keys(RepairRuleType).map(val => ({"value": RepairRuleType[val as keyof typeof RepairRuleType], "label": val}))},
-        {"col": "length", "type": "number"},
-        {"col": "relateEntity", "type": "string"},
-        {"col": "relateAttribute", "type": "string"},
-        {"col": "regexp", "type": "string"},
-        {"col": "collection", "type": "string"},
+        {"col": "isRegexpReplace", "type": "boolean", "parentColumn": "type"},
+        {"col": "replaceSource", "type": "string", "parentColumn": "type"},
+        {"col": "replaceTarget", "type": "string", "parentColumn": "type"},
+        {"col": "substringFormat", "type": "string", "parentColumn": "type"}
     ]
+
+    const filterValidationColumns:any = {
+        "type": {
+            [ValidationRuleType.Length]: ["length"],
+            [ValidationRuleType.Relate]: ["relateEntity", "relateAttribute"],
+            [ValidationRuleType.Collection]: ["collection"],
+            [ValidationRuleType.NotNull]: [],
+            [ValidationRuleType.Unique]: [],
+            [ValidationRuleType.Regexp]: ["regexp"],
+        }
+    }
+    const filterRepairColumns:any = {
+        "type": {
+            [RepairRuleType.Replace]: ["isRegexpReplace", "replaceSource", "replaceTarget"],
+            [RepairRuleType.Substring]: ["substringFormat"],
+        }
+    }
 
     const mergeEntityData = (editData:EntityProps) => {
         setValidator(prevState => {
@@ -528,6 +545,7 @@ export default function ConfigPage() {
                                     columns={validationColumns}
                                     mergeDataFunc={mergeValidationData}
                                     deleteItemFunc={deleteValidationItem}
+                                    filterColumns={filterValidationColumns}
                                 />
                             </Col>
                         </Row>
@@ -546,6 +564,7 @@ export default function ConfigPage() {
                                     columns={repairColumns}
                                     mergeDataFunc={mergeRepairData}
                                     deleteItemFunc={deleteRepairItem}
+                                    filterColumns={filterRepairColumns}
                                 />
                             </Col>
                         </Row>

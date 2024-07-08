@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { HolderOutlined, EditOutlined, DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import {Button, Col, Flex, Row, Input, Popconfirm, Select, InputNumber} from "antd";
+import {Button, Col, Flex, Row, Input, Popconfirm, Select, InputNumber, Checkbox} from "antd";
 import type { PopconfirmProps } from 'antd';
 import styles from './tableItem.less';
 
@@ -47,6 +47,16 @@ export function TableItem(props:any) {
     }
 
     const getComp = (column:any) => {
+        if (props.filterColumns && column.parentColumn !== undefined) {
+            let show = false
+            for (const key in props.filterColumns) {
+                if (Object.keys(editData).includes(key) && editData[key] !== "") {
+                    show = props.filterColumns[key][editData[column.parentColumn]].includes(column.col);
+                }
+            }
+            if (!show) return "";
+        }
+
         if (props.isEditting) {
             if (column.type === 'string') {
                 return <Input key={props.data.id + column.col} size="small" value={editData[column.col]} onChange={(e) => handleInputChange(e, column.col)}></Input>
@@ -54,6 +64,8 @@ export function TableItem(props:any) {
                 return <Select key={props.data.id + column.col} size="small" value={editData[column.col]} onChange={(e) => handleSelectChange(e, column.col)} options={column.options} />
             } else if (column.type === 'number') {
                 return <InputNumber key={props.data.id + column.col} size="small" value={editData[column.col]} onChange={(e) => handleNumberChange(e, column.col)} />
+            } else if (column.type === 'boolean') {
+                return <Checkbox key={props.data.id + column.col} checked={editData[column.col]} onChange={(e) => handleCheckboxChange(e, column.col)} />
             }
         } else {
             return <div key={props.data.id + column.col}>{editData[column.col]}</div>
@@ -71,6 +83,11 @@ export function TableItem(props:any) {
     const handleInputChange = (e:any, column:string) => {
         const { value } = e.target;
         setEditData({...editData, [column]: value});
+    };
+
+    const handleCheckboxChange = (e:any, column:string) => {
+        const { checked } = e.target;
+        setEditData({...editData, [column]: checked});
     };
 
     const cancelItem = () => {
