@@ -57,7 +57,7 @@ export function TableItem(props:any) {
             if (!show) return "";
         }
 
-        if (props.isEditting) {
+        if (props.isEditting && (column.disable === undefined || !column.disable)) {
             if (column.type === 'string') {
                 return <Input key={props.data.id + column.col} size="small" value={editData[column.col]} onChange={(e) => handleInputChange(e, column.col)}></Input>
             } else if (column.type === 'select') {
@@ -108,7 +108,7 @@ export function TableItem(props:any) {
         <div style={style} onClick={props.onClick}>
             <Flex gap="middle" justify={"flex-start"}>
                 <Button type="text" size="large" icon={<HolderOutlined />} style={{ cursor: 'move', width: '60px' }} ref={setNodeRef} {...attributes} {...listeners}/>
-                <Flex gap="small" style={{width: "100%"}}>
+                <Flex gap="small">
                     {props.columns && (props.columns.map((item:any) => getComp(item)))}
                 </Flex>
                 <Flex gap="small" style={{width: "100px"}}>

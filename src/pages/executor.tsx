@@ -4,11 +4,12 @@ import styles from './executor.less';
 import {history} from "@@/core/history";
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router";
-import {getExecutor, getFileEntities, getValidator} from "@/services/api";
+import {getExecutor, getFileEntities, saveExecutor} from "@/services/api";
 import {UploadOutlined} from "@ant-design/icons";
 import {ExecutorProps, MatchAttributeProps, MatchEntityProps} from "@/types/executor";
 import {AttributeProps, EntityProps, ValidatorProps} from "@/types/validator";
 import CustomTable from "@/components/CustomTable";
+import {AttributeType} from "@/types/enums";
 
 export default function ExecutorPage() {
     const urlParams  = useParams();
@@ -72,17 +73,23 @@ export default function ExecutorPage() {
         setSelectedMatchEntityId(id);
     }
 
-    const matchEntityColumns:any[] = [
-        {"col": "file_name", "type": "string"},
-        {"col": "entity_code", "type": "string"}
-    ]
+    const matchEntityColumns = () => {
+        const entities = validator.entities.filter((i) => i.active);
+        return [
+            {"col": "file_name", "type": "string", "disable": true},
+            {"col": "entity_code", "type": "select", "options": entities.map(entity => ({"value": entity.code, "label": entity.code}))}
+        ]
+    }
 
     const mergeMatchEntityData = (editData:MatchEntityProps) => {
+        const entityIndex = validator.entities.findIndex((entity) => entity.code === editData.entity_code);
         setExecutor(prevState => {
-            const entityIndex = prevState.match_entities.findIndex((entity) => entity.id === editData.id);
+            const matchEntityIndex = prevState.match_entities.findIndex((entity) => entity.id === editData.id);
             const newList = [...prevState.match_entities];
-            newList[entityIndex] = {
-                ...newList[entityIndex],
+            newList[matchEntityIndex] = {
+                ...newList[matchEntityIndex],
+                entity_id: validator.entities[entityIndex].id,
+                entity_code: validator.entities[entityIndex].code,
             };
             return {...prevState, match_entities: newList}
         })
@@ -120,18 +127,32 @@ export default function ExecutorPage() {
         })
     }
 
-    const matchAttrColumns:any[] = [
-        {"col": "column_name", "type": "string"},
-        {"col": "attribute_code", "type": "string"}
-    ]
+    const matchAttrColumns = () => {
+        let options:any[] = [];
+        if (selectedMatchEntityId !== "") {
+            const matchEntityIndex = executor.match_entities.findIndex((entity) => entity.id === selectedMatchEntityId);
+            const entityIndex = validator.entities.findIndex((i) => i.active && i.code === executor.match_entities[matchEntityIndex].entity_code);
+            if (entityIndex !== -1) {
+                options = validator.entities[entityIndex].attributes.map(attr => ({"value": attr.code, "label": attr.code}));
+            }
+        }
 
+        return [
+            {"col": "column_name", "type": "string", "disable": true},
+            {"col": "attribute_code", "type": "select", "options": options}
+        ]
+    }
     const mergeMatchAttrData = (editData:MatchAttributeProps) => {
+        const matchEntityIndex = executor.match_entities.findIndex((entity) => entity.id === selectedMatchEntityId);
+        const entityIndex = validator.entities.findIndex((i) => i.active && i.code === executor.match_entities[matchEntityIndex].entity_code);
+        const attrIndex = validator.entities[entityIndex].attributes.findIndex(attr => attr.code === editData.attribute_code);
         setExecutor(prevState => {
-            const entityIndex = prevState.match_entities.findIndex((entity) => entity.id === selectedMatchEntityId);
-            const attrIndex = prevState.match_entities[entityIndex].attributes.findIndex((entity) => entity.id === editData.id);
+            const matchAttrIndex = prevState.match_entities[matchEntityIndex].attributes.findIndex((entity) => entity.id === editData.id);
             const newList = [...prevState.match_entities];
-            newList[entityIndex].attributes[attrIndex] = {
-                ...newList[entityIndex].attributes[attrIndex],
+            newList[matchEntityIndex].attributes[matchAttrIndex] = {
+                ...newList[matchEntityIndex].attributes[matchAttrIndex],
+                attribute_id: validator.entities[entityIndex].attributes[attrIndex].id,
+                attribute_code: validator.entities[entityIndex].attributes[attrIndex].code,
             };
             return {...prevState, match_entities: newList}
         })
@@ -150,6 +171,21 @@ export default function ExecutorPage() {
         })
     }
 
+    const saveExecutorClick = () => {
+        saveExecutor(executor).then((result) => {
+            if (result.code == 200) {
+                const data = result.data;
+                setExecutor({
+                    id: data.id, code: data.code, name: data.name, active: data.active, validator_id: data.validator_id,
+                    execute_time: data.execute_time, match_entities: data.match_entities, config: data.config
+                });
+                setValidator(data.validator)
+                message.success("保存成功!")
+            }
+        }).catch((error) => {
+            message.error("保存失败!")
+        })
+    }
     return (
         <div>
             <Layout className={styles.layoutStyle}>
@@ -161,6 +197,7 @@ export default function ExecutorPage() {
                             <Button onClick={() => history.push("/")}>主页</Button>
                             <Button onClick={() => history.push("/config/" + executor.validator_id)}>配置</Button>
                             <Button onClick={() => history.push("/history/" + urlParams.id)}>历史</Button>
+                            <Button onClick={saveExecutorClick}>保存执行器</Button>
                         </Col>
                     </Row>
                 </Header>
@@ -181,7 +218,7 @@ export default function ExecutorPage() {
                                 setSelectedFunc={setActiveEntityId}
                                 editableId={editableMatchEntityId}
                                 setEditableFunc={setEditableMatchEntityId}
-                                columns={matchEntityColumns}
+                                columns={matchEntityColumns()}
                                 mergeDataFunc={mergeMatchEntityData}
                                 deleteItemFunc={deleteMatchEntityItem}
                             />
@@ -193,7 +230,7 @@ export default function ExecutorPage() {
                                 setDataFunc={setMatchAttrData}
                                 editableId={editableMatchAttrId}
                                 setEditableFunc={setEditableMatchAttrId}
-                                columns={matchAttrColumns}
+                                columns={matchAttrColumns()}
                                 mergeDataFunc={mergeMatchAttrData}
                                 deleteItemFunc={deleteMatchAttrItem}
                             />

@@ -1,4 +1,3 @@
-import {RepairRuleProps, ValidationRuleProps} from "@/types/validator";
 
 export interface ExecutorProps {
     id: string;

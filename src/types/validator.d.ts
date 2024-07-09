@@ -34,7 +34,7 @@ export interface ValidationRuleProps {
     relateEntity: string;
     relateAttribute: string;
     regexp: string;
-    collection: any[];
+    collection: string;
 }
 
 export interface RepairRuleProps {

@@ -211,7 +211,7 @@ export default function ConfigPage() {
             relateEntity: "",
             relateAttribute: "",
             regexp: "",
-            collection: []
+            collection: ""
         }
 
         setValidator(prevState => {
@@ -574,7 +574,7 @@ export default function ConfigPage() {
         </Layout>
         <Modal title="执行器" open={showAllExecutorsModal} footer={null} closable={false} onCancel={() => setShowAllExecutorsModal(false)}>
             {executors.map((executor, index) => (
-                <p onClick={() => history.push("/executor/" + executor.id )}>{executor.code} - {executor.name}</p>
+                <p key={executor.id} onClick={() => history.push("/executor/" + executor.id )}>{executor.code} - {executor.name}</p>
             ))}
         </Modal>
     </div>
