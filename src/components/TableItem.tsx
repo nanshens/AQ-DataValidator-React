@@ -59,11 +59,11 @@ export function TableItem(props:any) {
 
         if (props.isEditting && (column.disable === undefined || !column.disable)) {
             if (column.type === 'string') {
-                return <Input key={props.data.id + column.col} size="small" value={editData[column.col]} onChange={(e) => handleInputChange(e, column.col)}></Input>
+                return <Input key={props.data.id + column.col} placeholder={column.title} size="small" value={editData[column.col]} onChange={(e) => handleInputChange(e, column.col)}></Input>
             } else if (column.type === 'select') {
-                return <Select key={props.data.id + column.col} size="small" value={editData[column.col]} onChange={(e) => handleSelectChange(e, column.col)} options={column.options} />
+                return <Select key={props.data.id + column.col} placeholder={column.title} size="small" value={editData[column.col]} onChange={(e) => handleSelectChange(e, column.col)} options={column.options} />
             } else if (column.type === 'number') {
-                return <InputNumber key={props.data.id + column.col} size="small" value={editData[column.col]} onChange={(e) => handleNumberChange(e, column.col)} />
+                return <InputNumber key={props.data.id + column.col} placeholder={column.title} size="small" value={editData[column.col]} onChange={(e) => handleNumberChange(e, column.col)} />
             } else if (column.type === 'boolean') {
                 return <Checkbox key={props.data.id + column.col} checked={editData[column.col]} onChange={(e) => handleCheckboxChange(e, column.col)} />
             }

@@ -280,35 +280,35 @@ export default function ConfigPage() {
     const uploadRepairRuleProps: UploadProps = {...uploadProps, action: ""}
 
     const entityColumns:any[] = [
-        {"col": "code", "type": "string"},
-        {"col": "name", "type": "string"}
+        {"col": "code", "type": "string", "title": "实体"},
+        {"col": "name", "type": "string", "title": "名称"}
     ]
 
     const attrColumns:any[] = [
-        {"col": "code", "type": "string"},
-        {"col": "name", "type": "string"},
-        {"col": "type", "type": "select", "options": Object.keys(AttributeType).map(val => ({"value": AttributeType[val as keyof typeof AttributeType], "label": val}))}
+        {"col": "code", "type": "string", "title": "字段"},
+        {"col": "name", "type": "string", "title": "名称"},
+        {"col": "type", "type": "select", "title": "类型", "options": Object.keys(AttributeType).map(val => ({"value": AttributeType[val as keyof typeof AttributeType], "label": val}))}
     ]
 
     const validationColumns:any[] = [
-        {"col": "code", "type": "string"},
-        {"col": "name", "type": "string"},
-        {"col": "type", "type": "select", "options": Object.keys(ValidationRuleType).map(val => ({"value": ValidationRuleType[val as keyof typeof ValidationRuleType], "label": val}))},
-        {"col": "length", "type": "number", "parentColumn": "type"},
-        {"col": "relateEntity", "type": "string", "parentColumn": "type"},
-        {"col": "relateAttribute", "type": "string", "parentColumn": "type"},
-        {"col": "regexp", "type": "string", "parentColumn": "type"},
-        {"col": "collection", "type": "string", "parentColumn": "type"},
+        {"col": "code", "type": "string", "title": "字段"},
+        {"col": "name", "type": "string", "title": "名称"},
+        {"col": "type", "type": "select", "title": "类型", "options": Object.keys(ValidationRuleType).map(val => ({"value": ValidationRuleType[val as keyof typeof ValidationRuleType], "label": val}))},
+        {"col": "length", "type": "number", "parentColumn": "type", "title": "长度"},
+        {"col": "relateEntity", "type": "string", "parentColumn": "type", "title": "关联实体"},
+        {"col": "relateAttribute", "type": "string", "parentColumn": "type", "title": "关联属性"},
+        {"col": "regexp", "type": "string", "parentColumn": "type", "title": "正则表达式"},
+        {"col": "collection", "type": "string", "parentColumn": "type", "title": "集合"},
     ]
 
     const repairColumns:any[] = [
-        {"col": "code", "type": "string"},
-        {"col": "name", "type": "string"},
-        {"col": "type", "type": "select", "options": Object.keys(RepairRuleType).map(val => ({"value": RepairRuleType[val as keyof typeof RepairRuleType], "label": val}))},
-        {"col": "isRegexpReplace", "type": "boolean", "parentColumn": "type"},
-        {"col": "replaceSource", "type": "string", "parentColumn": "type"},
-        {"col": "replaceTarget", "type": "string", "parentColumn": "type"},
-        {"col": "substringFormat", "type": "string", "parentColumn": "type"}
+        {"col": "code", "type": "string", "title": "字段"},
+        {"col": "name", "type": "string", "title": "名称"},
+        {"col": "type", "type": "select", "title": "类型", "options": Object.keys(RepairRuleType).map(val => ({"value": RepairRuleType[val as keyof typeof RepairRuleType], "label": val}))},
+        {"col": "isRegexpReplace", "type": "boolean", "parentColumn": "type", "title": "正则替换"},
+        {"col": "replaceSource", "type": "string", "parentColumn": "type", "title": "原字符"},
+        {"col": "replaceTarget", "type": "string", "parentColumn": "type", "title": "新字符"},
+        {"col": "substringFormat", "type": "string", "parentColumn": "type", "title": "截取字符(a,b)"}
     ]
 
     const filterValidationColumns:any = {
